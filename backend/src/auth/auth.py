@@ -61,19 +61,31 @@ def get_token_auth_header():
     return token
 
 
-'''
-@TODO implement check_permissions(permission, payload) method
-    @INPUTS
-        permission: string permission (i.e. 'post:drink')
-        payload: decoded jwt payload
-
-    it should raise an AuthError if permissions are not included in the payload
-        !!NOTE check your RBAC settings in Auth0
-    it should raise an AuthError if the requested permission string is not in the payload permissions array
-    return true otherwise
-'''
 def check_permissions(permission, payload):
-    raise Exception('Not Implemented')
+    """Check the user has apermission to the given action
+
+    Args:
+        string: permission
+        dictionary: decoded jwt payload
+
+    Returns:
+        boolean: returns true when the user has a permission otherwise error is raised
+    """
+
+    if 'permissions' not in payload:
+        raise AuthError({
+            'code': 'no_permissions_included',
+            'description': 'JWT token is expected to have `permissions` parameter.".'
+        }, 401)
+
+    if permission not in payload['permissions']:
+        raise AuthError({
+            'code': 'permission_not_allowed',
+            'description': 'Permission is not allowed".'
+        }, 403)
+
+    return True
+
 
 '''
 @TODO implement verify_decode_jwt(token) method
