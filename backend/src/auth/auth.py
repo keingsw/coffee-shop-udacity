@@ -22,16 +22,44 @@ class AuthError(Exception):
 
 ## Auth Header
 
-'''
-@TODO implement get_token_auth_header() method
-    it should attempt to get the header from the request
-        it should raise an AuthError if no header is present
-    it should attempt to split bearer and the token
-        it should raise an AuthError if the header is malformed
-    return the token part of the header
-'''
 def get_token_auth_header():
-   raise Exception('Not Implemented')
+    """Validate authorization header in the request, and returns JWT token in request header.
+
+    Returns:
+        string: JWT token in request header
+    """
+
+    auth_header = request.headers.get('Authorization', None)
+
+    if not auth_header:
+        raise AuthError({
+            'code': 'authorization_header_missing',
+            'description': 'Authorization header is expected.'
+        }, 401)
+
+    auth_header_parts = auth_header.split(' ')
+
+    if auth_header_parts[0].lower() != 'bearer':
+        raise AuthError({
+            'code': 'invalid_header',
+            'description': 'Authorization header must start with "Bearer".'
+        }, 401)
+
+    elif len(auth_header_parts) == 1:
+        raise AuthError({
+            'code': 'invalid_header',
+            'description': 'No token found.".'
+        }, 401)
+
+    elif len(auth_header_parts) > 2:
+        raise AuthError({
+            'code': 'invalid_header',
+            'description': 'Authorization header must be bearer token.".'
+        }, 401)
+
+    token = auth_header_parts[1]
+    return token
+
 
 '''
 @TODO implement check_permissions(permission, payload) method
