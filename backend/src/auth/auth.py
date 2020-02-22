@@ -75,7 +75,7 @@ def check_permissions(permission, payload):
     if 'permissions' not in payload:
         raise AuthError({
             'code': 'no_permissions_included',
-            'description': 'JWT token is expected to have `permissions` parameter.".'
+            'description': 'JWT is expected to have `permissions` parameter.".'
         }, 401)
 
     if permission not in payload['permissions']:
