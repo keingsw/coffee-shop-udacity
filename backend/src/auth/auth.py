@@ -102,7 +102,6 @@ def verify_decode_jwt(token):
     jwks = json.loads(jsonurl.read())
 
     unverified_header = jwt.get_unverified_header(token)
-    print('unverified_header', unverified_header)
     if 'kid' not in unverified_header:
         raise AuthError({
             'status': 'invalid_header',
@@ -119,7 +118,6 @@ def verify_decode_jwt(token):
                 'n': key['n'],
                 'e': key['e'],
             }
-    print('rsa_key', rsa_key)
 
     if not rsa_key:
         raise AuthError({
