@@ -39,12 +39,15 @@ class DbError(ApiError):
 
 # ROUTES
 @app.route('/drinks', methods=['GET'])
-def get_drinks(payload):
+def get_drinks():
     drinks = Drink.query.all()
-    formatted_drinks = [drink.short() for drink in drinks]
+
+    if (len(drinks) < 1):
+        raise NotFoundError()
+
     return {
         'success': True,
-        'drinks': formatted_drinks
+        'drinks': [drink.short() for drink in drinks]
     }
 
 
