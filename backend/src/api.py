@@ -114,16 +114,6 @@ def edit_drink(payload, drink_id):
         drink.recipe = body.get('recipe', drink.recipe)
         drink.update()
 
-'''
-@TODO implement endpoint
-    DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
-'''
         drinks = Drink.query.all()
         if(len(drinks) < 1):
             raise NotFoundError()
@@ -137,6 +127,22 @@ def edit_drink(payload, drink_id):
         raise DbError()
 
 
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drink(payload, drink_id):
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+    if not drink:
+        raise NotFoundError()
+
+    try:
+        drink.delete()
+        return {
+            'success': True,
+            'delete': drink_id
+        }
+
+    except:
+        raise DbError()
 
 
 # Error Handling
