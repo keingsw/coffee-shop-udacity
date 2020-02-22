@@ -94,20 +94,25 @@ def create_drink(payload):
         raise DbError()
 
 
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def edit_drink(payload, drink_id):
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+    if not drink:
+        raise NotFoundError()
 
+    body = request.get_json()
+    for required_field in ['title', 'recipe']:
+        if required_field in body and body[required_field] == '':
+            raise UnprocessableError({
+                'status': 'invalid_request',
+                'message': f'{required_field.capitalize()} is required.　Empty string is not allowed.'
+            })
 
-'''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
-'''
-
+    try:
+        drink.title = body.get('title', drink.title)
+        drink.recipe = body.get('recipe', drink.recipe)
+        drink.update()
 
 '''
 @TODO implement endpoint
@@ -119,6 +124,19 @@ def create_drink(payload):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+        drinks = Drink.query.all()
+        if(len(drinks) < 1):
+            raise NotFoundError()
+
+        return {
+            'success': True,
+            'drinks': [drink.long() for drink in drinks]
+        }
+
+    except:
+        raise DbError()
+
+
 
 
 # Error Handling
