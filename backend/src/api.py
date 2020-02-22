@@ -79,7 +79,7 @@ def create_drink(payload):
 
     try:
         drink = Drink(title=body['title'],
-                      recipe=json.dumps([body['recipe']]))
+                      recipe=json.dumps(body['recipe']))
         drink.insert()
 
         drinks = Drink.query.all()
