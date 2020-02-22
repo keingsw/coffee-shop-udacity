@@ -45,10 +45,10 @@ def get_drinks():
     if (len(drinks) < 1):
         raise NotFoundError()
 
-    return {
+    return jsonify({
         'success': True,
         'drinks': [drink.short() for drink in drinks]
-    }
+    })
 
 
 @app.route('/drinks-detail', methods=['GET'])
@@ -59,10 +59,10 @@ def get_drinks_detail(payload):
     if(len(drinks) < 1):
         raise NotFoundError()
 
-    return {
+    return jsonify({
         'success': True,
         'drinks': [drink.long() for drink in drinks]
-    }
+    })
 
 
 @app.route('/drinks', methods=['POST'])
@@ -85,10 +85,10 @@ def create_drink(payload):
         if(len(drinks) < 1):
             raise NotFoundError(404)
 
-        return {
+        return jsonify({
             'success': True,
             'drinks': [drink.long() for drink in drinks]
-        }
+        })
 
     except:
         raise DbError()
@@ -118,10 +118,10 @@ def edit_drink(payload, drink_id):
         if(len(drinks) < 1):
             raise NotFoundError()
 
-        return {
+        return jsonify({
             'success': True,
             'drinks': [drink.long() for drink in drinks]
-        }
+        })
 
     except:
         raise DbError()
@@ -136,10 +136,10 @@ def delete_drink(payload, drink_id):
 
     try:
         drink.delete()
-        return {
+        return jsonify({
             'success': True,
             'delete': drink_id
-        }
+        })
 
     except:
         raise DbError()
