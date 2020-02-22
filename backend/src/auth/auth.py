@@ -9,18 +9,20 @@ AUTH0_DOMAIN = 'keingsw.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'coffee-shop'
 
-## AuthError Exception
+# AuthError Exception
 '''
 AuthError Exception
 A standardized way to communicate auth failure modes
 '''
+
+
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
 
 
-## Auth Header
+# Auth Header
 
 def get_token_auth_header():
     """Validate authorization header in the request, and returns JWT token in request header.
@@ -33,28 +35,28 @@ def get_token_auth_header():
 
     if not auth_header:
         raise AuthError({
-            'code': 'authorization_header_missing',
-            'description': 'Authorization header is expected.'
+            'status': 'authorization_header_missing',
+            'message': 'Authorization header is expected.'
         }, 401)
 
     auth_header_parts = auth_header.split(' ')
 
     if auth_header_parts[0].lower() != 'bearer':
         raise AuthError({
-            'code': 'invalid_header',
-            'description': 'Authorization header must start with "Bearer".'
+            'status': 'invalid_header',
+            'message': 'Authorization header must start with "Bearer".'
         }, 401)
 
     elif len(auth_header_parts) == 1:
         raise AuthError({
-            'code': 'invalid_header',
-            'description': 'No token found.".'
+            'status': 'invalid_header',
+            'message': 'No token found.".'
         }, 401)
 
     elif len(auth_header_parts) > 2:
         raise AuthError({
-            'code': 'invalid_header',
-            'description': 'Authorization header must be bearer token.".'
+            'status': 'invalid_header',
+            'message': 'Authorization header must be bearer token.".'
         }, 401)
 
     token = auth_header_parts[1]
@@ -74,14 +76,14 @@ def check_permissions(permission, payload):
 
     if 'permissions' not in payload:
         raise AuthError({
-            'code': 'no_permissions_included',
-            'description': 'JWT is expected to have `permissions` parameter.".'
+            'status': 'no_permissions_included',
+            'message': 'JWT is expected to have `permissions` parameter.".'
         }, 401)
 
     if permission not in payload['permissions']:
         raise AuthError({
-            'code': 'permission_not_allowed',
-            'description': 'Permission is not allowed".'
+            'status': 'permission_not_allowed',
+            'message': 'Permission is not allowed".'
         }, 403)
 
     return True
@@ -103,8 +105,8 @@ def verify_decode_jwt(token):
     print('unverified_header', unverified_header)
     if 'kid' not in unverified_header:
         raise AuthError({
-            'code': 'invalid_header',
-            'description': 'Authorization malformed.'
+            'status': 'invalid_header',
+            'message': 'Authorization malformed.'
         }, 401)
 
     rsa_key = {}
@@ -121,8 +123,8 @@ def verify_decode_jwt(token):
 
     if not rsa_key:
         raise AuthError({
-            'code': 'invalid_header',
-            'description': 'Unabble to find the appropriate key.'
+            'status': 'invalid_header',
+            'message': 'Unabble to find the appropriate key.'
         }, 401)
 
     try:
@@ -137,24 +139,24 @@ def verify_decode_jwt(token):
 
     except jwt.ExpiredSignatureError:
         raise AuthError({
-            'code': 'token_expired',
-            'description': 'Token expired.'
+            'status': 'token_expired',
+            'message': 'Token expired.'
         }, 401)
 
     except jwt.JWTClaimsError:
         raise AuthError({
-            'code': 'invalid_claims',
-            'description': 'Incorrect claims. Please, check the audience and issuer.'
+            'status': 'invalid_claims',
+            'message': 'Incorrect claims. Please, check the audience and issuer.'
         }, 401)
 
     except Exception:
         raise AuthError({
-            'code': 'invalid_header',
-            'description': 'Unable to parse authentication token.'
+            'status': 'invalid_header',
+            'message': 'Unable to parse authentication token.'
         }, 401)
 
 
-def require_auth(permission=''):
+def requires_auth(permission=''):
     """Gets a auth token from request header, verify the token, and check if the user has the requested permission
 
     Args:
