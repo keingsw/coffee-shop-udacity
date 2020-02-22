@@ -65,17 +65,35 @@ def get_drinks_detail(payload):
     }
 
 
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def create_drink(payload):
+    body = request.get_json()
+
+    for required_field in ['title', 'recipe']:
+        if required_field not in body or body[required_field] == '':
+            raise UnprocessableError({
+                'status': 'invalid_request',
+                'message': 'Title and recipe is required.'
+            })
+
+    try:
+        drink = Drink(title=body['title'], recipe=body['recipe'])
+        drink.insert()
+
+        drinks = Drink.query.all()
+        if(len(drinks) < 1):
+            raise NotFoundError(404)
+
+        return {
+            'success': True,
+            'drinks': [drink.long() for drink in drinks]
+        }
+
+    except:
+        raise DbError()
 
 
-'''
-@TODO implement endpoint
-    POST /drinks
-        it should create a new row in the drinks table
-        it should require the 'post:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
-'''
 
 
 '''
