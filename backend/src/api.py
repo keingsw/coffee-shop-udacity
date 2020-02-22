@@ -78,7 +78,8 @@ def create_drink(payload):
             })
 
     try:
-        drink = Drink(title=body['title'], recipe=body['recipe'])
+        drink = Drink(title=body['title'],
+                      recipe=json.dumps([body['recipe']]))
         drink.insert()
 
         drinks = Drink.query.all()
@@ -110,8 +111,11 @@ def edit_drink(payload, drink_id):
             })
 
     try:
-        drink.title = body.get('title', drink.title)
-        drink.recipe = body.get('recipe', drink.recipe)
+        title = body.get('title', drink.title)
+        recipe = body.get('recipe')
+
+        drink.title = title
+        drink.recipe = json.dumps(recipe) if recipe else drink.recipe
         drink.update()
 
         drinks = Drink.query.all()
